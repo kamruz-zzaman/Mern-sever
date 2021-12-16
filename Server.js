@@ -15,8 +15,16 @@ async function run() {
         await client.connect();
         const database = client.db("Atgworld");
         const statusCollection = database.collection("Status");
+        const UserInfCollection = database.collection("UserInfo");
 
-        // post a Status
+        // post a User
+        app.post('/user', async (req, res) => {
+            const data = req.body;
+            console.log(data);
+            const userData = await UserInfCollection.insertOne(data);
+            res.send(userData);
+        });
+        //post a status
         app.post('/status', async (req, res) => {
             const data = req.body;
             console.log(data);
@@ -30,7 +38,7 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-    res.send('Drone Peak Start')
+    res.send('Atg world is developers world')
 });
 
 
