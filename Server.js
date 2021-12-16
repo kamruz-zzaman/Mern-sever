@@ -4,9 +4,11 @@ require('dotenv').config()
 const cors = require('cors');
 const port = process.env.PORT || 5000;
 const { MongoClient } = require('mongodb');
+const fileUpload = require('express-fileupload');
+
 app.use(cors());
 app.use(express.json());
-
+app.use(fileUpload());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.utqcf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -26,7 +28,6 @@ async function run() {
                 const dataa = req.body;
                 const userData = await UserInfCollection.insertOne(dataa);
                 res.send(userData);
-                console.log(userData);
             }
             else {
                 res.send(404)
@@ -48,7 +49,6 @@ async function run() {
         // reset password
         app.put('/user', async (req, res) => {
             const data = req.body;
-            console.log(data);
             const userName = data.userName;
             const pass = data.pass;
             const filter = { userName: userName };
@@ -61,14 +61,35 @@ async function run() {
             const result = UserInfCollection.updateOne(filter, updateDoc, options);
             res.send(result);
         });
-        //post a status
+        // //post a status
+        // app.post('/status', async (req, res) => {
+        //     const data = req.body;
+        //     const status = await statusCollection.insertOne(data);
+        //     res.send(status);
+        // });
+
+
+        // sgfsb
         app.post('/status', async (req, res) => {
-            const data = req.body;
-            console.log(data);
-            const status = await statusCollection.insertOne(data);
+            const userStatus = req.body.userStatus;
+            const pic = req.files.Image;
+            console.log(req.files);
+            const picData = pic.data;
+            const encodedPic = picData.toString('base64');
+            const imageBuffer = Buffer.from(encodedPic, 'base64');
+            const status = {
+                userStatus,
+                image: imageBuffer
+            }
+            const result = await statusCollection.insertOne(status);
+            res.json(result);
+        })
+        // get post
+        app.get('/status', async (req, res) => {
+            const cursor = statusCollection.find({});
+            const status = await cursor.toArray();
             res.send(status);
         });
-
     } finally {
         // await client.close();f
     }
