@@ -45,6 +45,22 @@ async function run() {
                 res.send(404)
             }
         });
+        // reset password
+        app.put('/user', async (req, res) => {
+            const data = req.body;
+            console.log(data);
+            const userName = data.userName;
+            const pass = data.pass;
+            const filter = { userName: userName };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    password: pass
+                },
+            };
+            const result = UserInfCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        });
         //post a status
         app.post('/status', async (req, res) => {
             const data = req.body;
@@ -52,6 +68,7 @@ async function run() {
             const status = await statusCollection.insertOne(data);
             res.send(status);
         });
+
     } finally {
         // await client.close();f
     }
