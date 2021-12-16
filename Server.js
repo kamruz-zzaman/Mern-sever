@@ -35,14 +35,11 @@ async function run() {
         // get a User
         app.post('/userr', async (req, res) => {
             const data = req.body;
-            const email = data.userNameOrEmail;
-            // const userName = data.userNameOrEmail;
+            const userName = data.userName;
             const pass = data.pass;
-            const allUserInfo = await UserInfCollection.findOne({ email: email });
-            console.log(allUserInfo.password);
-            if (allUserInfo.password == pass) {
+            const allUserInfo = await UserInfCollection.findOne({ userName: userName });
+            if (allUserInfo?.password == pass) {
                 res.send('ok');
-                console.log('okay');
             }
             else {
                 res.send(404)
