@@ -33,22 +33,21 @@ async function run() {
             }
         });
         // get a User
-        // app.get('/user', async (req, res) => {
-        //     const cursor = UserInfCollection.find({});
-        //     const userData = await cursor.toArray();
-        //     res.send(userData);
-        //     const data = req.body;
-        //     const userName = data.userName;
-        //     const email = data.email;
-        //     const allUserInfo = await UserInfCollection.findOne({ email: email });
-        //     if (allUserInfo === userName || email) {
-        //         res.send(404);
-        //     }
-        //     else {
-        //         const userData = await UserInfCollection.insertOne(data);
-        //         res.send(userData);
-        //     }
-        // });
+        app.post('/userr', async (req, res) => {
+            const data = req.body;
+            const email = data.userNameOrEmail;
+            // const userName = data.userNameOrEmail;
+            const pass = data.pass;
+            const allUserInfo = await UserInfCollection.findOne({ email: email });
+            console.log(allUserInfo.password);
+            if (allUserInfo.password == pass) {
+                res.send('ok');
+                console.log('okay');
+            }
+            else {
+                res.send(404)
+            }
+        });
         //post a status
         app.post('/status', async (req, res) => {
             const data = req.body;
