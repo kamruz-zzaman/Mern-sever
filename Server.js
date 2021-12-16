@@ -17,13 +17,38 @@ async function run() {
         const statusCollection = database.collection("Status");
         const UserInfCollection = database.collection("UserInfo");
 
-        // post a User
+        // post a User info
         app.post('/user', async (req, res) => {
             const data = req.body;
-            console.log(data);
-            const userData = await UserInfCollection.insertOne(data);
-            res.send(userData);
+            const email = data.email;
+            const allUserInfo = await UserInfCollection.findOne({ email: email });
+            if (!allUserInfo) {
+                const dataa = req.body;
+                const userData = await UserInfCollection.insertOne(dataa);
+                res.send(userData);
+                console.log(userData);
+            }
+            else {
+                res.send(404)
+            }
         });
+        // get a User
+        // app.get('/user', async (req, res) => {
+        //     const cursor = UserInfCollection.find({});
+        //     const userData = await cursor.toArray();
+        //     res.send(userData);
+        //     const data = req.body;
+        //     const userName = data.userName;
+        //     const email = data.email;
+        //     const allUserInfo = await UserInfCollection.findOne({ email: email });
+        //     if (allUserInfo === userName || email) {
+        //         res.send(404);
+        //     }
+        //     else {
+        //         const userData = await UserInfCollection.insertOne(data);
+        //         res.send(userData);
+        //     }
+        // });
         //post a status
         app.post('/status', async (req, res) => {
             const data = req.body;
