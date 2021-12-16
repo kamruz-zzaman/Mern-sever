@@ -4,6 +4,7 @@ require('dotenv').config()
 const cors = require('cors');
 const port = process.env.PORT || 5000;
 const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 const fileUpload = require('express-fileupload');
 
 app.use(cors());
@@ -61,15 +62,8 @@ async function run() {
             const result = UserInfCollection.updateOne(filter, updateDoc, options);
             res.send(result);
         });
-        // //post a status
-        // app.post('/status', async (req, res) => {
-        //     const data = req.body;
-        //     const status = await statusCollection.insertOne(data);
-        //     res.send(status);
-        // });
 
-
-        // sgfsb
+        // post status
         app.post('/status', async (req, res) => {
             const userStatus = req.body.userStatus;
             const pic = req.files.Image;
@@ -84,12 +78,44 @@ async function run() {
             const result = await statusCollection.insertOne(status);
             res.json(result);
         })
+
         // get post
         app.get('/status', async (req, res) => {
             const cursor = statusCollection.find({});
             const status = await cursor.toArray();
             res.send(status);
         });
+        // update status
+        app.put('/status/:id', async (req, res) => {
+            const userStatus = req.body.userStatus;
+            const pic = req.files.Image;
+            console.log(req.files);
+            const picData = pic.data;
+            const encodedPic = picData.toString('base64');
+            const imageBuffer = Buffer.from(encodedPic, 'base64');
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    userStatus: userStatus,
+                    image: imageBuffer
+                },
+            };
+            const result = statusCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        });
+
+        app.get('/drones/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const package = await packagesCollection.findOne(query);
+            res.send(package);
+        });
+
+
+
+
     } finally {
         // await client.close();f
     }
