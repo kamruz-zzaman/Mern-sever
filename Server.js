@@ -87,33 +87,34 @@ async function run() {
         });
         // update status
         app.put('/status/:id', async (req, res) => {
-            const userStatus = req.body.userStatus;
-            const pic = req.files.Image;
-            console.log(req.files);
-            const picData = pic.data;
-            const encodedPic = picData.toString('base64');
-            const imageBuffer = Buffer.from(encodedPic, 'base64');
             const id = req.params.id;
+            const data = req.body.texStatus;
+            console.log(data);
             const filter = { _id: ObjectId(id) };
             const options = { upsert: true };
             const updateDoc = {
                 $set: {
-                    userStatus: userStatus,
-                    image: imageBuffer
+                    userStatus: data
                 },
             };
             const result = statusCollection.updateOne(filter, updateDoc, options);
             res.send(result);
         });
-
-        app.get('/drones/:id', async (req, res) => {
+        // get specific post
+        app.get('/status/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) }
-            const package = await packagesCollection.findOne(query);
-            res.send(package);
+            const status = await statusCollection.findOne(query);
+            res.send(status);
         });
 
-
+        // delet a post
+        app.delete('/status/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const status = await statusCollection.deleteOne(query);
+            res.send(status);
+        })
 
 
     } finally {
